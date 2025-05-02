@@ -45,7 +45,7 @@ export default function Login() {
       if (signInError) throw signInError;
       
       if (data.session) {
-        router.push("/dashboard");
+        router.push("/home");
       }
     } catch (err: any) {
       console.error("Login error:", err);
