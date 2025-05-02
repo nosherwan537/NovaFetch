@@ -1,4 +1,8 @@
+"use client"
 import { FaMobileAlt, FaLaptop, FaHeadphones, FaApple, FaGamepad, FaClock, FaHome, FaCog } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import Image from 'next/image';
 
 const featuredReviews = [
@@ -35,6 +39,28 @@ const categories = [
 ];
 
 export default function HomePage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/dashboard') // fallback page if no session
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4">Checking session...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) return null // prevent flicker
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <Header />
@@ -46,10 +72,10 @@ export default function HomePage() {
       </main>
       <Footer />
     </div>
-  );
+  )
 }
-
 function Header() {
+  const { user, loading, signOut } = useAuth()
   return (
     <header className="bg-gray-900 text-white py-4 px-8">
       <div className="flex justify-between items-center">
@@ -61,6 +87,12 @@ function Header() {
             <li><a href="#categories" className="hover:text-gray-300"><FaCog /></a></li>
             <li><a href="#latest" className="hover:text-gray-300"><FaGamepad /></a></li>
           </ul>
+          <button
+            onClick={signOut}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+          >
+            Sign Out
+          </button>
         </nav>
       </div>
     </header>
@@ -193,7 +225,7 @@ function Footer() {
   return (
     <footer className="bg-gray-900 text-white py-6 px-8">
       <div className="flex justify-between items-center">
-        <p>&copy; 2025 TechReviews. All rights reserved.</p>
+        <p>&copy; 2025 NovaFetch. All rights reserved.</p>
         <div className="flex space-x-6">
           <a href="#" className="hover:text-gray-400">Privacy Policy</a>
           <a href="#" className="hover:text-gray-400">Terms of Service</a>
