@@ -26,7 +26,7 @@ export default function Home() {
                 <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : user ? (
                 <div className="flex items-center space-x-4">
-                  <Link href="/dashboard" className="text-white hover:underline">
+                  <Link href="/dashboard" className="text-white hover:underline relative z-30">
                     Dashboard
                   </Link>
                   <button
@@ -68,13 +68,13 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-md mx-auto border border-blue-100 dark:border-gray-700"
+                className="mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-md mx-auto border border-blue-100 dark:border-gray-700 relative z-30"
               >
                 <h3 className="text-xl font-semibold mb-2">Logged in as:</h3>
                 <p className="mb-4 text-blue-700 dark:text-blue-300">{user.email}</p>
                 <Link
                   href="/dashboard"
-                  className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 px-6 rounded shadow-md transition-transform duration-300 hover:scale-105"
+                  className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 px-6 rounded shadow-md transition-transform duration-300 hover:scale-105 relative z-30"
                 >
                   Go to Dashboard
                 </Link>
