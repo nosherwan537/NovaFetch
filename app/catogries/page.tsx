@@ -13,6 +13,24 @@ interface Category {
   description: string
 }
 
+const fallbackCategories: Category[] = [
+  {
+    id: 1,
+    name: 'Tech Gadgets',
+    description: 'Latest gadgets and devices in the world of technology.'
+  },
+  {
+    id: 2,
+    name: 'Books',
+    description: 'Explore fiction, non-fiction, educational, and motivational reads.'
+  },
+  {
+    id: 3,
+    name: 'Fitness & Health',
+    description: 'All things fitness, from supplements to workout equipment.'
+  }
+]
+
 export default function CategoriesPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -31,8 +49,9 @@ export default function CategoriesPage() {
       if (error) {
         setError('Failed to fetch categories.')
         console.error(error)
+        setCategories(fallbackCategories)
       } else {
-        setCategories(data || [])
+        setCategories(data && data.length > 0 ? data : fallbackCategories)
       }
     }
 
