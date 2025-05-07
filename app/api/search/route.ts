@@ -22,7 +22,6 @@ export async function GET(req: NextRequest) {
         product: query,
         reddit: redditReviews,
       });
-  
 
     return NextResponse.json({
       product: query,
