@@ -121,12 +121,13 @@ export default function HomePage() {
         ) : searchResults ? (
           <SearchResults results={searchResults} />
         ) : (
+          null
+        )}
           <>
             <FeaturedReviews />
             <Categories />
             <LatestReviews />
           </>
-        )}
       </main>
       <Footer />
     </div>
