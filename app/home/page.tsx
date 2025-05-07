@@ -3,7 +3,6 @@ import { FaMobileAlt, FaLaptop, FaHeadphones, FaApple, FaGamepad, FaClock, FaHom
 import { useAuth } from '../../context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import Image from 'next/image';
 
 const featuredReviews = [
   {
@@ -50,13 +49,13 @@ interface SearchResultsProps {
     redditReviews: Array<{
       title: string;
       content: string;
-      score: number;
+      upvotes: number;
       url: string;
     }>;
     youtubeVideo?: {
       title: string;
-      description: string;
       videoId: string;
+      channelTitle: string;
     };
     gemini?: {
       opinion: string;
@@ -415,7 +414,7 @@ function SearchResults({ results }: SearchResultsProps) {
                     <h4 className="text-xl font-semibold mb-2">{review.title}</h4>
                     <p className="text-gray-600 mb-4">{review.content}</p>
                     <div className="flex items-center text-sm text-gray-500">
-                      <span className="mr-4">Score: {review.score}</span>
+                      <span className="mr-4">Upvotes: {review.upvotes}</span>
                       <a href={review.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                         View on Reddit
                       </a>
@@ -441,8 +440,9 @@ function SearchResults({ results }: SearchResultsProps) {
                   className="w-full h-full rounded-lg"
                 ></iframe>
               </div>
-              <h4 className="text-xl font-semibold mb-2">{results.youtubeVideo.title}</h4>
-              <p className="text-gray-600">{results.youtubeVideo.description}</p>
+
+              <h4 className="text-xl font-semibold mb-2">{results.youtubeVideo.channelTitle}</h4>
+              <p className="text-gray-600">{results.youtubeVideo.title}</p>
             </div>
           )}
 
