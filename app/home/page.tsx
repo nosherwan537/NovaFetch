@@ -405,11 +405,11 @@ function SearchResults({ results }: SearchResultsProps) {
           {/* Reddit Reviews */}
           {expandedSections.reddit && (
             <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6 flex items-center">
+              <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
                 <FaReddit className="text-red-500 mr-3" />
                 Reddit Reviews
               </h3>
-              <div className="grid gap-6">
+              <div className="grid gap-6 p-5">
                 {results.redditReviews.map((review: SearchResultsProps['results']['redditReviews'][0], index: number) => (
                   <div key={index} className="border-b border-gray-200 last:border-0 pb-6 last:pb-0">
                     <h4 className="text-xl font-semibold mb-2">{review.title}</h4>
@@ -429,7 +429,7 @@ function SearchResults({ results }: SearchResultsProps) {
           {/* YouTube Video */}
           {expandedSections.youtube && results.youtubeVideo && (
             <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6 flex items-center">
+              <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
                 <FaYoutube className="text-red-600 mr-3" />
                 YouTube Review
               </h3>
@@ -450,7 +450,7 @@ function SearchResults({ results }: SearchResultsProps) {
           {/* Gemini Summary */}
           {expandedSections.gemini && results.gemini && (
             <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6 flex items-center">
+              <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
                 <FaRobot className="text-blue-500 mr-3" />
                 AI Analysis
               </h3>
