@@ -15,6 +15,33 @@ interface Product {
   created_at: string
 }
 
+const fallbackProducts: Product[] = [
+  {
+    id: 1,
+    name: 'NovaDesk Organizer',
+    description: 'A sleek desk organizer to declutter your workspace.',
+    price: 19.99,
+    image_url: 'https://via.placeholder.com/300x200?text=NovaDesk',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 2,
+    name: 'Aurora Mug',
+    description: 'Ceramic mug with color-changing galaxy design.',
+    price: 14.99,
+    image_url: 'https://via.placeholder.com/300x200?text=Aurora+Mug',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 3,
+    name: 'Zen Headphones',
+    description: 'Wireless headphones with noise cancellation and long battery life.',
+    price: 59.99,
+    image_url: 'https://via.placeholder.com/300x200?text=Zen+Headphones',
+    created_at: new Date().toISOString()
+  }
+]
+
 export default function ProductsPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
@@ -37,8 +64,9 @@ export default function ProductsPage() {
       if (error) {
         setError('Failed to load products.')
         console.error(error)
+        setProducts(fallbackProducts)
       } else {
-        setProducts(data || [])
+        setProducts(data && data.length > 0 ? data : fallbackProducts)
       }
     }
 
@@ -90,12 +118,6 @@ export default function ProductsPage() {
             </motion.div>
           ))}
         </div>
-
-        {!loading && user && products.length === 0 && (
-          <div className="mt-10 text-center text-gray-600 dark:text-gray-400">
-            No products found.
-          </div>
-        )}
       </div>
     </main>
   )
