@@ -10,7 +10,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Use a secure server-side key for sensitive operations
+  process.env.SUPABASE_SERVICE_ROLE_KEY! 
 );
 
 export const authConfig: NextAuthOptions = {
@@ -32,7 +32,6 @@ export const authConfig: NextAuthOptions = {
 
         if (error || !userData) return null;
 
-        // NOTE: In production, passwords should be hashed and checked using bcrypt or similar.
         if (userData.password === credentials.password) {
           const { password, ...userWithoutPassword } = userData;
           return userWithoutPassword as User;
