@@ -4,7 +4,6 @@ export async function getRedditReviews(product: string) {
   
     const res = await fetch(url);
     const json = await res.json();
-  
     return json.data.children.map((post: any) => ({
       title: post.data.title,
       content: post.data.selftext,
