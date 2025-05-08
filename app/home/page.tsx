@@ -61,15 +61,15 @@ interface SearchResultsProps {
   results: {
     product: string;
     redditReviews: Array<{
-      title: string;
-      content: string;
-      upvotes: number;
-      url: string;
+      reddit_title: string;
+      reddit_content: string;
+      reddit_upvotes: number;
+      reddit_url: string;
     }>;
     youtubeReview?: Array<{
-      title: string;
-      videoId: string;
-      channelTitle: string;
+      video_title: string;
+      video_id: string;
+      channel_title: string;
     }>;
     geminiSummary?: Array<{
       opinion: string;
@@ -485,13 +485,13 @@ function SearchResults({ results }: SearchResultsProps) {
                       className="border-b border-gray-200 last:border-0 pb-6 last:pb-0"
                     >
                       <h4 className="text-xl font-semibold mb-2">
-                        {review.title}
+                        {review.reddit_title}
                       </h4>
-                      <p className="text-gray-600 mb-4">{review.content}</p>
+                      <p className="text-gray-600 mb-4">{review.reddit_content}</p>
                       <div className="flex items-center text-sm text-gray-500">
-                        <span className="mr-4">Upvotes: {review.upvotes}</span>
+                        <span className="mr-4">Upvotes: {review.reddit_upvotes}</span>
                         <a
-                          href={review.url}
+                          href={review.reddit_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"
@@ -515,7 +515,7 @@ function SearchResults({ results }: SearchResultsProps) {
               </h3>
               <div className="aspect-w-16 aspect-h-9 h-96 mb-4 rounded-lg overflow-hidden">
                 <iframe
-                  src={`https://www.youtube.com/embed/${results?.youtubeReview?.[0]?.videoId}`}
+                  src={`https://www.youtube.com/embed/${results?.youtubeReview?.[0]?.video_id}`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full rounded-lg"
@@ -523,9 +523,9 @@ function SearchResults({ results }: SearchResultsProps) {
               </div>
 
               <h4 className="text-xl font-semibold mb-2">
-                {results?.youtubeReview?.[0]?.channelTitle}
+                {results?.youtubeReview?.[0]?.channel_title}
               </h4>
-              <p className="text-gray-600">{results.youtubeReview?.[0].title}</p>
+              <p className="text-gray-600">{results.youtubeReview?.[0].video_title}</p>
             </div>
           )}
 
