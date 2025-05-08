@@ -104,7 +104,6 @@ export default function HomePage() {
         `/api/search?query=${encodeURIComponent(searchQuery)}`
       );
       const data = await response.json();
-      console.log(data?.review);
       setSearchResults(data?.review);
     } catch (error) {
       console.error("Search failed:", error);

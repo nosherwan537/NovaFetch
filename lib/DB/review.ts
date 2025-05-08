@@ -128,10 +128,8 @@ export async function getReview(search_query: string) {
     return;
   }
   if(!data||data?.length===0){
-    console.log(data)
     return null;
   }
-  console.log("data", data)
 
   return     {
     product: search_query,

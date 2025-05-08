@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
   try {
     const review = await getReview(query);
     if (review ) {
-      console.log("Review found in DB:", review);
       return NextResponse.json({ review }, { status: 200 });
     }
 
