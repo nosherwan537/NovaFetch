@@ -39,7 +39,7 @@ export async function insertReview(
         .select("*")
         .eq("search_query", search_query);
 
-  if (data && data.length > 0) {
+  if (data && data?.length > 0) {
     return;
   }
 
@@ -52,6 +52,7 @@ export async function insertReview(
     console.error("Error inserting review:", insertError);
     return;
   }
+  console.log("Inserted review:", review_data);
 
   const review_id = review_data?.[0]?.id;
   if (!review_id) {
@@ -71,7 +72,6 @@ export async function insertReview(
     .from("redditreviews")
     .insert(redditPayload).select();
 
-    // console.log("ai review", ai)
   const { data: ai_data, error: aiError } = await supabase
     .from("aireviews")
     .insert([
@@ -127,6 +127,7 @@ export async function getReview(search_query: string) {
     console.error("Error fetching joined reviews:", error);
     return;
   }
+
   if(!data||data?.length===0){
     return null;
   }

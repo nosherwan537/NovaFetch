@@ -46,6 +46,7 @@ export async function GET(req: NextRequest) {
       redditReviews?.length > 0 &&
       youtube
     ) {
+      
       await insertReview(query, userId, redditReviews, geminiSummary, youtube);
     }
 

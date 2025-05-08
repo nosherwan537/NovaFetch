@@ -66,16 +66,16 @@ interface SearchResultsProps {
       upvotes: number;
       url: string;
     }>;
-    youtubeReview?: {
+    youtubeReview?: Array<{
       title: string;
       videoId: string;
       channelTitle: string;
-    };
-    geminiSummary?: {
+    }>;
+    geminiSummary?: Array<{
       opinion: string;
       specs: string;
       sentiment: string;
-    };
+    }>;
   };
 }
 
@@ -351,6 +351,7 @@ function LatestReviews() {
 }
 
 function SearchResults({ results }: SearchResultsProps) {
+  console.log(results)
   const [expandedSections, setExpandedSections] = useState({
     reddit: false,
     youtube: false,
@@ -506,7 +507,7 @@ function SearchResults({ results }: SearchResultsProps) {
           )}
 
           {/* YouTube Video */}
-          {expandedSections.youtube && results.youtubeReview && (
+          {expandedSections.youtube && results.youtubeReview?.[0] && (
             <div className="bg-white shadow-lg rounded-lg p-6">
               <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
                 <FaYoutube className="text-red-600 mr-3" />
@@ -514,7 +515,7 @@ function SearchResults({ results }: SearchResultsProps) {
               </h3>
               <div className="aspect-w-16 aspect-h-9 h-96 mb-4 rounded-lg overflow-hidden">
                 <iframe
-                  src={`https://www.youtube.com/embed/${results.youtubeReview.videoId}`}
+                  src={`https://www.youtube.com/embed/${results?.youtubeReview?.[0]?.videoId}`}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className="w-full h-full rounded-lg"
@@ -522,14 +523,14 @@ function SearchResults({ results }: SearchResultsProps) {
               </div>
 
               <h4 className="text-xl font-semibold mb-2">
-                {results.youtubeReview.channelTitle}
+                {results?.youtubeReview?.[0]?.channelTitle}
               </h4>
-              <p className="text-gray-600">{results.youtubeReview.title}</p>
+              <p className="text-gray-600">{results.youtubeReview?.[0].title}</p>
             </div>
           )}
 
           {/* Gemini Summary */}
-          {expandedSections.gemini && results.youtubeReview && (
+          {expandedSections.gemini && results.geminiSummary?.[0] && (
             <div className="bg-white shadow-lg rounded-lg p-6">
               <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
                 <FaRobot className="text-blue-500 mr-3" />
@@ -537,16 +538,16 @@ function SearchResults({ results }: SearchResultsProps) {
               </h3>
               <div className="prose max-w-none">
                 <p className="text-gray-600 mb-6">
-                  {results.geminiSummary?.opinion}
+                  {results.geminiSummary?.[0]?.opinion}
                 </p>
                 <div className="grid md:grid-cols-2 gap-6">
-                  {results?.geminiSummary?.specs && (
+                  {results?.geminiSummary?.[0]?.specs && (
                     <div className="bg-green-50 rounded-lg p-4">
                       <h4 className="text-lg font-semibold mb-3 text-green-700">
                         Specs
                       </h4>
                       <p className="text-gray-600 mb-4">
-                        {results.geminiSummary?.specs}
+                        {results.geminiSummary?.[0]?.specs}
                       </p>
                       {/* <ul className="space-y-2">
                         {results.gemini.specs.map((pro: string, index: number) => (
