@@ -13,6 +13,8 @@ import {
   FaReddit,
   FaYoutube,
   FaRobot,
+  FaCheckCircle,
+  FaArrowUp,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -312,7 +314,7 @@ const latestReviews = [
 function LatestReviews() {
   return (
     <section id="latest" className="py-16">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 z">
         <h2 className="text-2xl font-bold mb-8">Latest Reviews</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {latestReviews?.map((review, index) => (
@@ -351,7 +353,7 @@ function LatestReviews() {
 }
 
 function SearchResults({ results }: SearchResultsProps) {
-  console.log(results)
+  console.log(results);
   const [expandedSections, setExpandedSections] = useState({
     reddit: false,
     youtube: false,
@@ -407,7 +409,7 @@ function SearchResults({ results }: SearchResultsProps) {
           </div>
 
           {/* YouTube Summary Card */}
-          <div className="bg-white shadow-lg rounded-lg p-6">
+          <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col h-full">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center">
                 <FaYoutube className="text-2xl text-red-600 mr-3" />
@@ -418,7 +420,7 @@ function SearchResults({ results }: SearchResultsProps) {
             <p className="text-gray-600 mb-4">Video review and analysis</p>
             <button
               onClick={() => toggleSection("youtube")}
-              className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+              className="mt-auto w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
             >
               {expandedSections.youtube ? (
                 <>
@@ -469,12 +471,13 @@ function SearchResults({ results }: SearchResultsProps) {
         <div className="space-y-8">
           {/* Reddit Reviews */}
           {expandedSections.reddit && (
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
-                <FaReddit className="text-red-500 mr-3" />
+            <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100">
+              <h3 className="text-3xl font-bold mb-8 flex justify-center items-center text-red-500">
+                <FaReddit className="text-4xl mr-3" />
                 Reddit Reviews
               </h3>
-              <div className="grid gap-6 p-5">
+
+              <div className="grid gap-6">
                 {results?.redditReviews?.map(
                   (
                     review: SearchResultsProps["results"]["redditReviews"][0],
@@ -482,19 +485,24 @@ function SearchResults({ results }: SearchResultsProps) {
                   ) => (
                     <div
                       key={index}
-                      className="border-b border-gray-200 last:border-0 pb-6 last:pb-0"
+                      className="bg-gray-50 hover:bg-white transition-all duration-200 border border-gray-200 rounded-xl p-5 shadow-sm"
                     >
-                      <h4 className="text-xl font-semibold mb-2">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-2">
                         {review.reddit_title}
                       </h4>
-                      <p className="text-gray-600 mb-4">{review.reddit_content}</p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <span className="mr-4">Upvotes: {review.reddit_upvotes}</span>
+                      <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                        {review.reddit_content}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span className="flex items-center space-x-1 italic">
+                          <FaArrowUp className="text-red-400" />
+                          <span>Upvotes: {review.reddit_upvotes}</span>
+                        </span>
                         <a
                           href={review.reddit_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
+                          className="text-blue-600 hover:underline font-medium"
                         >
                           View on Reddit
                         </a>
@@ -508,72 +516,79 @@ function SearchResults({ results }: SearchResultsProps) {
 
           {/* YouTube Video */}
           {expandedSections.youtube && results.youtubeReview?.[0] && (
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
-                <FaYoutube className="text-red-600 mr-3" />
+            <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-100">
+              <h3 className="text-2xl font-bold mb-6 flex justify-center items-center text-red-600">
+                <FaYoutube className="text-3xl mr-3" />
                 YouTube Review
               </h3>
-              <div className="aspect-w-16 aspect-h-9 h-96 mb-4 rounded-lg overflow-hidden">
-                <iframe
-                  src={`https://www.youtube.com/embed/${results?.youtubeReview?.[0]?.video_id}`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-full h-full rounded-lg"
-                ></iframe>
+
+              <div className="mb-6 rounded-xl overflow-hidden shadow-md border border-gray-200">
+                <div className="h-96 w-full">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${results?.youtubeReview?.[0]?.video_id}`}
+                    title="YouTube Video Review"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
+                  ></iframe>
+                </div>
               </div>
 
-              <h4 className="text-xl font-semibold mb-2">
-                {results?.youtubeReview?.[0]?.channel_title}
-              </h4>
-              <p className="text-gray-600">{results.youtubeReview?.[0].video_title}</p>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div className="mb-3 md:mb-0">
+                  <h4 className="text-lg font-semibold text-gray-800">
+                    {results?.youtubeReview?.[0]?.channel_title}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {results.youtubeReview?.[0].video_title}
+                  </p>
+                </div>
+                <a
+                  href={`https://www.youtube.com/watch?v=${results.youtubeReview?.[0]?.video_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg shadow transition"
+                >
+                  Watch on YouTube
+                </a>
+              </div>
             </div>
           )}
 
           {/* Gemini Summary */}
           {expandedSections.gemini && results.geminiSummary?.[0] && (
-            <div className="bg-white shadow-lg rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6 flex justify-center items-center">
-                <FaRobot className="text-blue-500 mr-3" />
+            <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100">
+              <h3 className="text-3xl font-bold mb-8 flex justify-center items-center text-blue-600">
+                <FaRobot className="text-4xl mr-3" />
                 AI Analysis
               </h3>
-              <div className="prose max-w-none">
-                <p className="text-gray-600 mb-6">
-                  {results.geminiSummary?.[0]?.opinion}
-                </p>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {results?.geminiSummary?.[0]?.specs && (
-                    <div className="bg-green-50 rounded-lg p-4">
-                      <h4 className="text-lg font-semibold mb-3 text-green-700">
-                        Specs
-                      </h4>
-                      <p className="text-gray-600 mb-4">
-                        {results.geminiSummary?.[0]?.specs}
-                      </p>
-                      {/* <ul className="space-y-2">
-                        {results.gemini.specs.map((pro: string, index: number) => (
-                          <li key={index} className="text-green-700 flex items-start">
-                            <span className="mr-2">✓</span>
-                            {pro}
-                          </li>
-                        ))}
-                      </ul> */}
-                    </div>
-                  )}
-                  {/* {results.gemini.cons && (
-                    <div className="bg-red-50 rounded-lg p-4">
-                      <h4 className="text-lg font-semibold mb-3 text-red-700">Cons</h4>
-                      <ul className="space-y-2">
-                        {results.gemini.cons.map((con: string, index: number) => (
-                          <li key={index} className="text-red-700 flex items-start">
-                            <span className="mr-2">×</span>
-                            {con}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )} */}
-                </div>
+
+              <div className="text-gray-700 text-lg leading-relaxed mb-10">
+                {results.geminiSummary[0].opinion}
               </div>
+
+              {results.geminiSummary[0].specs && (
+                <div className="bg-gradient-to-br from-green-50 to-white border border-green-100 rounded-xl p-6 shadow-inner">
+                  <div className="flex items-center mb-5">
+                    <FaCheckCircle className="text-green-500 text-xl mr-2" />
+                    <h4 className="text-xl font-semibold text-green-700">
+                      Key Specifications
+                    </h4>
+                  </div>
+                  <ul className="space-y-3 pl-4">
+                    {results.geminiSummary[0].specs
+                      .split("\n")
+                      .map((spec: string, index: number) => (
+                        <li
+                          key={index}
+                          className="relative pl-6 text-gray-800 before:content-[''] before:absolute before:left-0 before:top-2.5 before:w-2 before:h-2 before:rounded-full before:bg-green-500"
+                        >
+                          {spec}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
