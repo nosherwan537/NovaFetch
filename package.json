@@ -11,9 +11,13 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
+    "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.9.4",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.3.1",
     "next-auth": "^4.24.11",
     "react": "^19.1.0",
@@ -25,7 +29,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^20.17.46",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",

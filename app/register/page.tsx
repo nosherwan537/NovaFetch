@@ -27,43 +27,46 @@ export default function Register() {
     checkUser();
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    // Basic validation
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
+  // Basic validation
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const response = await fetch('/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        username: name, 
+        email, 
+        password 
+      }),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Registration failed');
     }
-
-    try {
-      // Register with email and password
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-          },
-        },
-      });
-
-      if (signUpError) throw signUpError;
-      
-      if (data.user) {
-        router.push("/login?registered=true");
-      }
-    } catch (err: any) {
-      console.error("Registration error:", err);
-      setError(err.message || "Registration failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+    
+    // Redirect to login page with success message
+    router.push('/login?registered=true');
+  } catch (err: any) {
+    console.error("Registration error:", err);
+    setError(err.message || "Registration failed. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);

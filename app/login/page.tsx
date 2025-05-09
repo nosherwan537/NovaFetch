@@ -31,44 +31,65 @@ export default function Login() {
     }
   }, [router, searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+  interface FormEvent extends React.FormEvent<HTMLFormElement> {}
 
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+const handleSubmit = async (e: FormEvent): Promise<void> => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-      if (signInError) throw signInError;
-      
-      if (data.session) {
-        router.push("/home");
-      }
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.message || "Invalid login credentials. Please try again.");
-    } finally {
-      setIsLoading(false);
+  try {
+    const response = await fetch('/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Login failed');
     }
-  };
-
+    
+    // Store the token in localStorage or a secure cookie
+    localStorage.setItem('token', data.token);
+    
+    // Redirect to home page
+    router.push('/home');
+  } catch (err: any) {
+    console.error("Login error:", err);
+    setError(err.message || "Invalid login credentials. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            // Request access to user's profile data including email, name, and avatar
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
       
       if (error) throw error;
-    } catch (err: any) {
+      
+      // No need to redirect here as the OAuth flow will handle it
+    } catch (err) {
       console.error("Google sign-in error:", err);
-      setError(err.message || "Failed to sign in with Google. Please try again.");
+      if (err instanceof Error) {
+        setError(err.message || "Failed to sign in with Google. Please try again.");
+      } else {
+        setError("Failed to sign in with Google. Please try again.");
+      }
       setIsLoading(false);
     }
   };
