@@ -1,36 +1,69 @@
 // app/api/search/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { getRedditReviews } from '@/app/lib/scrapers/redditAdapter';
-import { getYoutubeReviewVideo } from '@/app/lib/scrapers/youtubeAdapter';
-import { analyzeReviewsWithGemini } from '@/app/lib/scrapers/geminiAdapter';
+import { NextRequest, NextResponse } from "next/server";
+import { getRedditReviews } from "@/app/lib/scrapers/redditAdapter";
+import { getYoutubeReviewVideo } from "@/app/lib/scrapers/youtubeAdapter";
+import { analyzeReviewsWithGemini } from "@/app/lib/scrapers/geminiAdapter";
+import { getReview, insertReview } from "@/lib/DB/review";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get('query');
+  const userId = searchParams.get("userId");
+  const query = searchParams.get("query");
 
-  if (!query || typeof query !== 'string') {
-    return NextResponse.json({ error: 'Missing query' }, { status: 400 });
+  if (!query || typeof query !== "string") {
+    return NextResponse.json({ error: "Missing query" }, { status: 400 });
   }
 
+
   try {
-    const [redditReviews, youtubeVideo] = await Promise.all([
+    const review = await getReview(query);
+    if (review ) {
+      return NextResponse.json({ review }, { status: 200 });
+    }
+
+    const [redditReviews, youtubeReview] = await Promise.all([
       getRedditReviews(query),
       getYoutubeReviewVideo(query),
     ]);
 
-    const geminiSummary = await analyzeReviewsWithGemini({
-        product: query,
-        reddit: redditReviews,
-      });
+    const youtube = youtubeReview
+      ? {
+          video_title: youtubeReview.title,
+          thumbnail_url: youtubeReview.thumbnail,
+          video_id: youtubeReview.videoId,
+          channel_title: youtubeReview.channelTitle,
+        }
+      : null;
 
-    return NextResponse.json({
+    const geminiSummary = await analyzeReviewsWithGemini({
       product: query,
-      redditReviews,
-      youtubeVideo,
-      gemini: geminiSummary,
+      reddit: redditReviews,
     });
+
+    if (
+      geminiSummary &&
+      redditReviews?.length > 0 &&
+      youtube
+    ) {
+      
+      await insertReview(query, userId, redditReviews, geminiSummary, youtube);
+    }
+
+   
+    return NextResponse.json({
+      review:{
+        product: query,
+        redditReviews,
+        youtubeReview: youtube,
+        geminiSummary,
+      }},
+      { status: 200 }
+    );
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Search API error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
