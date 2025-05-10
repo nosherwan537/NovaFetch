@@ -23,6 +23,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Sankofa_Display } from "next/font/google";
+import Link from 'next/link';
 
 const featuredReviews = [
   {
@@ -450,13 +451,12 @@ function Categories() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 px-8">
         {categories?.map((category, index) => (
-          <div
-            key={index}
-            className="bg-white shadow-xl rounded-3xl p-8 text-center transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-teal-400"
-          >
-            <category.icon className="text-6xl mb-4 text-blue-600 mx-auto" />
-            <p className="text-sm text-gray-600">{category.name}</p>
-          </div>
+          <Link href={`/${category.name.toLowerCase()}`} key={index}>
+            <div className="cursor-pointer bg-white shadow-xl rounded-3xl p-8 text-center transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-teal-400">
+             <category.icon className="text-6xl mb-4 text-blue-600 mx-auto" />
+             <p className="text-sm text-gray-600">{category.name}</p>
+            </div>
+          </Link>
         ))}
       </div>
     </section>
