@@ -15,10 +15,14 @@ import {
   FaRobot,
   FaCheckCircle,
   FaArrowUp,
+  FaThumbsUp,
+  FaUserAlt,
+  FaBolt,
 } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Sankofa_Display } from "next/font/google";
 
 const featuredReviews = [
   {
@@ -81,6 +85,12 @@ interface SearchResultsProps {
   };
 }
 
+interface Recommendation {
+  product: string;
+  specs: string;
+  reason: string;
+}
+
 type SectionType = "reddit" | "youtube" | "gemini";
 
 export default function HomePage() {
@@ -89,6 +99,8 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -96,13 +108,41 @@ export default function HomePage() {
     }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!user?.id) return;
+      
+      setIsLoadingRecommendations(true);
+      try {
+        const response = await fetch(`/api/recommend?userId=${encodeURIComponent(user.id)}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch recommendations');
+        }
+        const data = await response.json();
+        setRecommendations(data.recommendations || []);
+      } catch (error) {
+        console.error("Failed to fetch recommendations:", error);
+      } finally {
+        setIsLoadingRecommendations(false);
+      }
+    };
+
+    if (user?.id) {
+      fetchRecommendations();
+    }
+  }, [user?.id]);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()||!user?.id) return;
+    if (!searchQuery.trim() || !user?.id) return;
 
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}&userId=${encodeURIComponent(user.id)}`);
+      const response = await fetch(
+        `/api/search?query=${encodeURIComponent(
+          searchQuery
+        )}&userId=${encodeURIComponent(user.id)}`
+      );
       const data = await response.json();
       setSearchResults(data?.review);
     } catch (error) {
@@ -111,6 +151,24 @@ export default function HomePage() {
       setIsSearching(false);
     }
   };
+   
+
+  const triggerSearch = async (query: string) => {
+  if (!query.trim() || !user?.id) return;
+  setSearchQuery(query);
+  setIsSearching(true);
+  try {
+    const response = await fetch(
+      `/api/search?query=${encodeURIComponent(query)}&userId=${encodeURIComponent(user.id)}`
+    );
+    const data = await response.json();
+    setSearchResults(data?.review);
+  } catch (error) {
+    console.error("Search failed:", error);
+  } finally {
+    setIsSearching(false);
+  }
+};
 
   if (loading) {
     return (
@@ -142,6 +200,14 @@ export default function HomePage() {
           <SearchResults results={searchResults} />
         ) : null}
         <>
+         <PersonalizedRecommendations 
+  recommendations={recommendations}
+  isLoading={isLoadingRecommendations}
+  error={null}
+  setSearchQuery={setSearchQuery}
+  triggerSearch={triggerSearch}
+/>
+
           <FeaturedReviews />
           <Categories />
           <LatestReviews />
@@ -151,6 +217,124 @@ export default function HomePage() {
     </div>
   );
 }
+
+function getIconForProduct(product: string) {
+  const name = product.toLowerCase();
+  if (name.includes("mobile") || name.includes("phone")) return FaMobileAlt;
+  if (name.includes("laptop") || name.includes("notebook") || name.includes("macbook")) return FaLaptop;
+  if (name.includes("headphone") || name.includes("earbud") || name.includes("audio")) return FaHeadphones;
+  return FaGamepad;
+}
+
+function PersonalizedRecommendations({
+  recommendations,
+  isLoading,
+  error,
+  setSearchQuery,
+  triggerSearch,
+}: {
+  recommendations: Recommendation[];
+  isLoading: boolean;
+  error: string | null;
+  setSearchQuery: (query: string) => void;
+  triggerSearch: (query: string) => void;
+}) {
+  if (isLoading) {
+    return (
+      <section className="py-24 bg-gradient-to-br from-indigo-100 to-purple-100">
+        <div className="container mx-auto px-6 text-center animate-pulse">
+          <h3 className="text-5xl font-extrabold text-gray-800 mb-6">Your Recommendations</h3>
+          <p className="text-xl text-gray-500 mb-8">Loading personalized magic just for you...</p>
+          <div className="flex justify-center">
+            <div className="w-16 h-16 border-8 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="py-24 bg-gradient-to-br from-indigo-100 to-purple-100">
+        <div className="container mx-auto px-6 text-center">
+          <h3 className="text-5xl font-extrabold text-gray-800 mb-6">Your Recommendations</h3>
+          <p className="text-lg text-red-500 mb-6">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition duration-300 shadow-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  if (recommendations && recommendations.length > 0) {
+    return (
+      <section id="recommendations" className="py-24 bg-gradient-to-br from-indigo-100 to-purple-100">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h3 className="text-5xl font-extrabold text-gray-800 mb-4 drop-shadow-sm">
+              ✨ Recommended For You
+            </h3>
+            <p className="text-xl text-gray-600">
+              Crafted with AI based on your interests and search history
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+            {recommendations.map((recommendation, index) => {
+              const Icon = getIconForProduct(recommendation.product);
+              return (
+                <div
+                  key={index}
+                  className="relative bg-white bg-opacity-80 backdrop-blur-lg rounded-3xl p-6 shadow-xl border border-gray-200 transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-purple-400 flex flex-col"
+                >
+                  <div className="absolute inset-0 rounded-3xl border-2 border-transparent hover:border-purple-400 transition pointer-events-none" />
+
+                  {/* Top Section */}
+                  <div className="flex items-center mb-6">
+                    <div className="p-4 bg-purple-100 rounded-full mr-4 shadow-inner">
+                      <Icon className="text-purple-600 text-3xl" />
+                    </div>
+                    <h4 className="text-2xl font-semibold text-gray-800">{recommendation.product}</h4>
+                  </div>
+
+                  {/* Growing Body Section */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div className="mb-4 pl-4 border-l-4 border-purple-300">
+                      <p className="text-base text-gray-700 whitespace-pre-line">{recommendation.specs}</p>
+                    </div>
+
+                    <div className="flex items-start space-x-2 mb-6">
+                      <FaThumbsUp className="text-green-500 mt-1" />
+                      <p className="text-sm text-gray-700">{recommendation.reason}</p>
+                    </div>
+                  </div>
+
+                  {/* Button Section - Always Bottom */}
+                  <button
+                    onClick={() => {
+                      setSearchQuery(recommendation.product);
+                      triggerSearch(recommendation.product);
+                    }}
+                    className="w-full py-2.5 mt-auto bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold text-sm tracking-wide shadow-lg hover:brightness-110 transition duration-300"
+                  >
+                    🔍 Search It
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return null;
+}
+
 function Header() {
   const { user, loading, signOut } = useAuth();
   return (
@@ -218,24 +402,27 @@ function HeroSection({
 
 function FeaturedReviews() {
   return (
-    <section id="featured" className="py-16 bg-gray-100">
-      <div className="text-center mb-12">
-        <h3 className="text-3xl font-semibold">Featured Reviews</h3>
-        <p className="text-lg text-gray-600">
-          Check out our top reviews from the world of technology!
-        </p>
+    <section id="featured" className="py-24 bg-gray-100">
+      <div className="text-center mb-16">
+     <h3 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 mb-4">
+  Featured Reviews
+</h3>
+
+
+
+        <p className="text-lg text-gray-600">Check out our top reviews from the world of technology!</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-8">
         {featuredReviews?.map((review, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-lg p-12 text-center"
+            className="bg-white shadow-xl rounded-3xl p-8 text-center transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-purple-400"
           >
             <div className="mb-4">
               <review.icon size={50} className="text-blue-600 mx-auto" />
             </div>
             <p className="text-sm text-gray-600">{review.category}</p>
-            <h4 className="text-xl font-semibold mb-2">{review.title}</h4>
+            <h4 className="text-2xl font-semibold mb-2 text-gray-800">{review.title}</h4>
             <div className="flex justify-center mb-4">
               <span className="text-primary font-medium">{review.score}/5</span>
             </div>
@@ -251,19 +438,21 @@ function FeaturedReviews() {
 
 function Categories() {
   return (
-    <section id="categories" className="py-16 bg-gray-200">
-      <div className="text-center mb-12">
-        <h3 className="text-3xl font-semibold">Categories</h3>
-        <p className="text-lg text-gray-600">
-          Browse through different tech categories to find the right product for
-          you!
-        </p>
+    <section id="categories" className="py-24 bg-gray-100">
+      <div className="text-center mb-16">
+     <h3 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 mb-4">
+  Categories
+</h3>
+
+
+
+        <p className="text-lg text-gray-600">Browse through different tech categories to find the right product for you!</p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 px-8">
         {categories?.map((category, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-lg p-12 text-center"
+            className="bg-white shadow-xl rounded-3xl p-8 text-center transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-teal-400"
           >
             <category.icon className="text-6xl mb-4 text-blue-600 mx-auto" />
             <p className="text-sm text-gray-600">{category.name}</p>
@@ -311,26 +500,31 @@ const latestReviews = [
 
 function LatestReviews() {
   return (
-    <section id="latest" className="py-16">
-      <div className="container mx-auto px-4 z">
-        <h2 className="text-2xl font-bold mb-8">Latest Reviews</h2>
-        <div className="grid md:grid-cols-2 gap-6">
+    <section id="latest" className="py-24 bg-gradient-to-r from-indigo-50 via-purple-200 to-indigo-100">
+      <div className="container mx-auto px-4">
+       <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 mb-12 text-center">
+  Latest Reviews
+</h2>
+
+        <div className="grid md:grid-cols-2 gap-12">
           {latestReviews?.map((review, index) => (
-            <div key={index} className="bg-white shadow-lg rounded-lg p-6">
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-sm text-muted-foreground">
-                  {review.date}
-                </span>
+            <div
+              key={index}
+              className="bg-white shadow-2xl rounded-3xl p-8 transition-all transform hover:scale-105 hover:shadow-xl hover:ring-2 hover:ring-purple-500 duration-300 ease-in-out"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <span className="text-sm text-muted-foreground">{review.date}</span>
+                <span className="text-sm text-gray-500">{review.category}</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">{review.title}</h3>
-              <p className="text-muted-foreground mb-4">{review.excerpt}</p>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-4">{review.title}</h3>
+              <p className="text-lg text-gray-600 mb-6">{review.excerpt}</p>
               <div className="flex flex-col">
-                <span className="text-sm font-medium mb-1">Sources:</span>
-                <div className="flex flex-wrap gap-2">
+                <span className="text-sm font-medium mb-2">Sources:</span>
+                <div className="flex flex-wrap gap-3">
                   {review?.sources?.map((source, i) => (
                     <span
                       key={i}
-                      className="text-sm bg-muted px-2 py-1 rounded"
+                      className="text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-lg"
                     >
                       {source}
                     </span>
@@ -340,9 +534,9 @@ function LatestReviews() {
             </div>
           ))}
         </div>
-        <div className="text-center mt-8">
-          <a href="#" className="text-primary hover:underline">
-            View all reviews →
+        <div className="text-center mt-10">
+          <a href="#" className="text-indigo-600 hover:underline text-lg">
+            View all reviews → 
           </a>
         </div>
       </div>
@@ -350,8 +544,10 @@ function LatestReviews() {
   );
 }
 
+
+
 function SearchResults({ results }: SearchResultsProps) {
-  console.log ("Search Results:")
+  console.log("Search Results:");
   console.log(results);
   const [expandedSections, setExpandedSections] = useState({
     reddit: false,
@@ -367,31 +563,33 @@ function SearchResults({ results }: SearchResultsProps) {
   };
 
   return (
-    <section className="py-16 px-4">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl font-semibold mb-8">
-          Search Results for "{results.product}"
+    <section className="py-24 px-6 bg-gradient-to-r from-indigo-100 to-purple-200">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-5xl font-extrabold text-gray-800 mb-12 text-center drop-shadow-lg">
+          Search Results for{" "}
+          <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text">
+            "{results.product}"
+          </span>
         </h2>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {/* Reddit Summary Card */}
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative bg-white shadow-xl rounded-3xl p-8 flex flex-col justify-between transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-purple-400">
+            <div className="absolute inset-0 rounded-3xl border-2 border-transparent hover:border-purple-400 transition pointer-events-none" />
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <FaReddit className="text-2xl text-red-500 mr-3" />
-                <h3 className="text-xl font-semibold">Reddit Reviews</h3>
+                <FaReddit className="text-3xl text-red-500 mr-4" />
+                <h3 className="text-2xl font-semibold text-gray-800">Reddit Reviews</h3>
               </div>
-              <span className="text-sm text-gray-500">
-                {results.redditReviews?.length} reviews
-              </span>
+              <span className="text-sm text-gray-500">{results.redditReviews?.length} reviews</span>
             </div>
             <p className="text-gray-600 mb-4">
               Community insights and discussions from Reddit
             </p>
             <button
               onClick={() => toggleSection("reddit")}
-              className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+              className="w-full py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:bg-gray-300 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
             >
               {expandedSections.reddit ? (
                 <>
@@ -408,18 +606,19 @@ function SearchResults({ results }: SearchResultsProps) {
           </div>
 
           {/* YouTube Summary Card */}
-          <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative bg-white shadow-xl rounded-3xl p-8 flex flex-col justify-between transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-purple-400">
+            <div className="absolute inset-0 rounded-3xl border-2 border-transparent hover:border-purple-400 transition pointer-events-none" />
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <FaYoutube className="text-2xl text-red-600 mr-3" />
-                <h3 className="text-xl font-semibold">YouTube Review</h3>
+                <FaYoutube className="text-3xl text-red-600 mr-4" />
+                <h3 className="text-2xl font-semibold text-gray-800">YouTube Review</h3>
               </div>
               <span className="text-sm text-gray-500">1 video</span>
             </div>
             <p className="text-gray-600 mb-4">Video review and analysis</p>
             <button
               onClick={() => toggleSection("youtube")}
-              className="mt-auto w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+              className="w-full py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:bg-gray-300 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
             >
               {expandedSections.youtube ? (
                 <>
@@ -436,11 +635,12 @@ function SearchResults({ results }: SearchResultsProps) {
           </div>
 
           {/* Gemini Summary Card */}
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative bg-white shadow-xl rounded-3xl p-8 flex flex-col justify-between transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300 hover:ring-2 hover:ring-purple-400">
+            <div className="absolute inset-0 rounded-3xl border-2 border-transparent hover:border-purple-400 transition pointer-events-none" />
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <FaRobot className="text-2xl text-blue-500 mr-3" />
-                <h3 className="text-xl font-semibold">AI Analysis</h3>
+                <FaRobot className="text-3xl text-blue-500 mr-4" />
+                <h3 className="text-2xl font-semibold text-gray-800">AI Analysis</h3>
               </div>
               <span className="text-sm text-gray-500">AI-powered insights</span>
             </div>
@@ -449,7 +649,7 @@ function SearchResults({ results }: SearchResultsProps) {
             </p>
             <button
               onClick={() => toggleSection("gemini")}
-              className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors"
+              className="w-full py-3 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:bg-gray-300 rounded-lg flex items-center justify-center gap-2 transition-all duration-200"
             >
               {expandedSections.gemini ? (
                 <>
@@ -465,6 +665,7 @@ function SearchResults({ results }: SearchResultsProps) {
             </button>
           </div>
         </div>
+      
 
         {/* Expanded Sections */}
         <div className="space-y-8">
@@ -489,7 +690,7 @@ function SearchResults({ results }: SearchResultsProps) {
                       <h4 className="text-lg font-semibold text-gray-800 mb-2">
                         {review.reddit_title}
                       </h4>
-                      <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                      <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-1">
                         {review.reddit_content}
                       </p>
                       <div className="flex items-center justify-between text-xs text-gray-500">
