@@ -71,10 +71,10 @@ export default function Home() {
             >
               <p className="mb-2 text-blue-700 dark:text-blue-300">Logged in as {user.email}</p>
               <Link
-                href="/dashboard"
+                href="/home"
                 className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-6 rounded shadow-md hover:scale-105 transition-transform"
               >
-                Go to Dashboard
+                Go to home
               </Link>
             </motion.div>
           ) : (
