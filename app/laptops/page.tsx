@@ -1,11 +1,12 @@
 "use client";
-import { FaLaptop, FaWindows, FaApple } from "react-icons/fa";
 import Link from 'next/link';
+
+import { FaLaptop, FaApple, FaWindows, FaKeyboard } from "react-icons/fa";
 
 const featuredReviews = [
   {
     title: "MacBook Pro 16-inch (2023)",
-    icon: FaLaptop,
+    icon: FaApple,
     score: 4.9,
     sources: 15,
     category: "Laptops",
@@ -19,9 +20,51 @@ const featuredReviews = [
   },
   {
     title: "Lenovo ThinkPad X1 Carbon",
-    icon: FaLaptop,
+    icon: FaKeyboard,
     score: 4.7,
     sources: 10,
+    category: "Laptops",
+  },
+  {
+    title: "HP Spectre x360",
+    icon: FaWindows,
+    score: 4.6,
+    sources: 11,
+    category: "Laptops",
+  },
+  {
+    title: "Asus ROG Zephyrus G14",
+    icon: FaLaptop,
+    score: 4.5,
+    sources: 13,
+    category: "Laptops",
+  },
+  {
+    title: "Acer Swift X",
+    icon: FaLaptop,
+    score: 4.4,
+    sources: 9,
+    category: "Laptops",
+  },
+  {
+    title: "Microsoft Surface Laptop 5",
+    icon: FaWindows,
+    score: 4.3,
+    sources: 10,
+    category: "Laptops",
+  },
+  {
+    title: "Razer Blade 15",
+    icon: FaLaptop,
+    score: 4.6,
+    sources: 12,
+    category: "Laptops",
+  },
+  {
+    title: "LG Gram 17",
+    icon: FaLaptop,
+    score: 4.2,
+    sources: 8,
     category: "Laptops",
   },
 ];

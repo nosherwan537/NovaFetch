@@ -1,6 +1,7 @@
 "use client";
-import { FaApple } from "react-icons/fa";
 import Link from 'next/link';
+
+import { FaApple, FaAndroid, FaHeartbeat, FaClock, FaBolt, FaRunning } from "react-icons/fa";
 
 const featuredReviews = [
   {
@@ -12,16 +13,58 @@ const featuredReviews = [
   },
   {
     title: "Samsung Galaxy Watch 6",
-    icon: FaApple,
+    icon: FaAndroid,
     score: 4.8,
     sources: 28,
     category: "Wearables",
   },
   {
     title: "Fitbit Charge 6",
-    icon: FaApple,
+    icon: FaHeartbeat,
     score: 4.6,
     sources: 22,
+    category: "Wearables",
+  },
+  {
+    title: "Garmin Forerunner 965",
+    icon: FaRunning,
+    score: 4.7,
+    sources: 20,
+    category: "Wearables",
+  },
+  {
+    title: "Google Pixel Watch 2",
+    icon: FaAndroid,
+    score: 4.5,
+    sources: 18,
+    category: "Wearables",
+  },
+  {
+    title: "Amazfit GTR 4",
+    icon: FaClock,
+    score: 4.3,
+    sources: 14,
+    category: "Wearables",
+  },
+  {
+    title: "Huawei Watch GT 4",
+    icon: FaBolt,
+    score: 4.2,
+    sources: 10,
+    category: "Wearables",
+  },
+  {
+    title: "Coros Pace 3",
+    icon: FaRunning,
+    score: 4.4,
+    sources: 9,
+    category: "Wearables",
+  },
+  {
+    title: "Xiaomi Smart Band 8",
+    icon: FaHeartbeat,
+    score: 4.1,
+    sources: 8,
     category: "Wearables",
   },
 ];

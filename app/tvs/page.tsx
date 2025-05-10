@@ -24,7 +24,71 @@ const featuredReviews = [
     sources: 14,
     category: "TVs",
   },
+  {
+    title: "TCL 6-Series Mini-LED",
+    icon: FaTv,
+    score: 4.5,
+    sources: 10,
+    category: "TVs",
+  },
+  {
+    title: "Vizio P-Series Quantum X",
+    icon: FaTv,
+    score: 4.4,
+    sources: 8,
+    category: "TVs",
+  },
+  {
+    title: "Hisense U8H",
+    icon: FaTv,
+    score: 4.6,
+    sources: 11,
+    category: "TVs",
+  },
+  {
+    title: "Panasonic LZ2000",
+    icon: FaDesktop,
+    score: 4.3,
+    sources: 7,
+    category: "TVs",
+  },
+  {
+    title: "Philips OLED+936",
+    icon: FaTv,
+    score: 4.2,
+    sources: 5,
+    category: "TVs",
+  },
+  {
+    title: "Sharp Aquos XLED",
+    icon: FaDesktop,
+    score: 4.1,
+    sources: 6,
+    category: "TVs",
+  },
+  {
+    title: "Samsung The Frame",
+    icon: FaTv,
+    score: 4.6,
+    sources: 13,
+    category: "TVs",
+  },
+  {
+    title: "LG NanoCell 90",
+    icon: FaTv,
+    score: 4.0,
+    sources: 4,
+    category: "TVs",
+  },
+  {
+    title: "Sony X90L",
+    icon: FaDesktop,
+    score: 4.5,
+    sources: 9,
+    category: "TVs",
+  },
 ];
+
 
 export default function TVsPage() {
   return (
