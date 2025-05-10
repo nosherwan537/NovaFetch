@@ -25,7 +25,7 @@ export const authConfig: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         const { data: userData, error } = await supabase
-          .from("user")
+          .from("users")
           .select("*")
           .eq("email", credentials.email)
           .single();
