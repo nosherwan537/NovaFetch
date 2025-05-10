@@ -31,9 +31,43 @@ export async function GET(req: NextRequest) {
 
   const queries = reviews.map(r => r.search_query).filter(Boolean);
 
-  if (queries.length === 0) {
-    return NextResponse.json({ error: 'No search queries found' }, { status: 404 });
+ if (queries.length === 0) {
+  const defaultPrompt = `
+    You are a tech product recommendation engine.
+
+    Recommend 3 popular tech products for a new user. Respond in **valid JSON** only in this format:
+
+    {
+      "recommendations": [
+        {
+          "product": "Product Name",
+          "specs": "Key specs",
+          "reason": "Why it's recommended"
+        }
+      ]
+    }
+
+    Do not include any explanation or markdown, only valid JSON.
+  `;
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const result = await model.generateContent(defaultPrompt);
+    const text = result.response.text();
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const json = JSON.parse(jsonMatch[0]);
+      return NextResponse.json(json);
+    } else {
+      throw new Error('No valid JSON found');
+    }
+  } catch (err) {
+    console.error('Gemini error (default):', err);
+    return NextResponse.json({ error: 'Failed to generate default recommendations' }, { status: 500 });
   }
+}
+
 
   // Create Gemini prompt
   const prompt = `
