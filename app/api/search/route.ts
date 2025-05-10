@@ -40,14 +40,16 @@ export async function GET(req: NextRequest) {
       reddit: redditReviews,
     });
 
-    if (
+     if (
       geminiSummary &&
       redditReviews?.length > 0 &&
-      youtube
+      youtube &&
+      userId
     ) {
-      
-      await insertReview(query, userId, redditReviews, geminiSummary, youtube);
+      const insertedReview = await insertReview(query, userId, redditReviews, geminiSummary, youtube);
+      return NextResponse.json({ review: insertedReview }, { status: 201 });
     }
+
 
    
     return NextResponse.json({

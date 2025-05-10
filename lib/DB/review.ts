@@ -30,14 +30,14 @@ export async function insertReview(
 ) {
   const { data, error } = user_id
     ? await supabase
-        .from("review")
-        .select("*")
-        .eq("user_id", user_id)
-        .eq("search_query", search_query)
+      .from("review")
+      .select("*")
+      .eq("user_id", user_id)
+      .eq("search_query", search_query)
     : await supabase
-        .from("review")
-        .select("*")
-        .eq("search_query", search_query);
+      .from("review")
+      .select("*")
+      .eq("search_query", search_query);
 
   if (data && data?.length > 0) {
     return;
@@ -105,9 +105,15 @@ export async function insertReview(
     return;
   }
 
-  
 
-  return { reddit_data, ai_data, youtube_data };
+
+  return {
+    product: search_query,
+    redditReviews: reddit_data,
+    youtubeReview: youtube_data,
+    geminiSummary: ai_data,
+  }
+
 }
 
 export async function getReview(search_query: string) {
@@ -128,11 +134,11 @@ export async function getReview(search_query: string) {
     return;
   }
 
-  if(!data||data?.length===0){
+  if (!data || data?.length === 0) {
     return null;
   }
 
-  return     {
+  return {
     product: search_query,
     redditReviews: data?.[0]?.redditreviews,
     youtubeReview: data?.[0]?.youtubereviews,
